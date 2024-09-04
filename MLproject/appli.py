@@ -21,11 +21,21 @@ if type_data == "Regression":
 elif type_data == "Classification":
     df = load_and_encode()
     histogram_plot(df)
-    pairplots(df)
+#Identify columns of interest based on correlation with the target
     correlation_table(df)
     expl = explicative_columns(df)
+    st.write(f"Features with an absolute correlation with the target are:")
+    st.write(expl)
+    liste_col = list(df.columns[:-1])
+    if st.text_input("Do you want to select a subset of features?", "YES"):
+        liste_col = st.text_input("Do you want to select a subset of features?", liste_col)
+    else:
+        pass
+
+    pairplots(df,liste_col)
+
     colin = colinearities(df)
-    st.write(expl,colin)
+    st.write(colin)
     autoML = st.text_input("if you want a fully automated analyses write YES","NO")
     if autoML == "YES":
         standariztion_features(df)
