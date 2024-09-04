@@ -48,18 +48,20 @@ def histogram_plot(df):
 #plt.show()
     return st.pyplot(fig)
 
-def pairplots(df,list_items=["proanthocyanins", "proline", "target"]):      #The list of fetures has to be a choice of the user, among column names
+def pairplots(df,list_items):      #The list of fetures has to be a choice of the user, among column names
     # Pairplot des features selectionnés avec la variable cible
-    pairplot_cols = list_items
+    pairplot_cols = list_items + ["target"]
 
     # sns.pairplot(df[pairplot_cols], hue="target", palette="viridis")
     pairplot_fig = sns.pairplot(df[pairplot_cols], hue="target")
     pairplot_fig.fig.suptitle('Pairplot of Selected Features', y=1.02)  # Adjust y for spacing
 
     return st.pyplot(pairplot_fig.fig)
-def correlation_table(df,list_items=["proanthocyanins", "proline", "target"]):      #Idem list to ask
+def correlation_table(df,list_items):      #Idem list to ask
+    list_features= list_items + ["target"]
+
     # Correlate the list of columns of the DataFrame list_items
-    correlation_matrix = df[list_items].corr()
+    correlation_matrix = df[list_features].corr()
     # Create a mask to hide the upper triangle of the heatmap.
     mask = np.triu(correlation_matrix)
 # Create the heatmap.
@@ -101,8 +103,10 @@ def explicative_columns(df):
 #Recherche des colinéarités
 
 
-def colinearities(df):
+def colinearities(df, liste_columns):
     # Créer une matrice de features (sans la target)
+    columns = liste_columns +["target"]
+    df=df[columns]
     X = df.drop('target', axis=1)
 
     # Calculer le VIF (Variance inflation factor) pour chaque feature
