@@ -15,12 +15,14 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 from imblearn.over_sampling import SMOTE
 
-def standariztion_features(df):
-
+def standariztion_features(df, list_columns):
+    df2= pd.DataFrame()
 # standardization des colonnes de list_to_norm
-    for col in df.columns[:-1]:
-        df[col] = (df[col] - df[col].mean()) / df[col].std()
-    return df
+    for col in list_columns:
+        df2[col] = (df[col] - df[col].mean()) / df[col].std()
+
+    df2["target"]=df["target"]
+    return df2
 
 def split_dataset(df,test_size=0.2):
 #split the dataset

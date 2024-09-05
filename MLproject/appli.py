@@ -29,24 +29,27 @@ elif type_data == "Classification":
 
     expl = explicative_columns(df)
 
-    st.write(f"Features with an absolute correlation with the target are:")
+    st.write(f"Features with an absolute correlation >0.5 with the target are:")
     st.write(expl)
 
-    list_choice = st.multiselect("Choisissez vos features", options=liste_col, default=liste_col)
+    list_choice = st.multiselect("Define your features of interest", options=liste_col, default=liste_col)
     #first_check = st.button("Afficher les corrélations")
-    first_check = st.text_input("Afficher les corrélations")
-    pairplots(df,list_choice)
+    #first_check = st.text_input("Afficher les corrélations")
+    if st.checkbox("Afficher les corrélations"):
+        pairplots(df,list_choice)
 
-    colin = colinearities(df, liste_col)
-    st.write(colin)
-    autoML = st.text_input("if you want a fully automated analyses write YES","NO")
-    if autoML == "YES":
-        standariztion_features(df)
-        X_train, X_test, y_train, y_test = split_dataset(df)
-        #X_train, y_train = balancing_train(X_train, y_train)
-        auto_ML_selection(X_train,y_train,X_test,y_test)
-    else:
-        st.write("The autoanalysis will not be done")
+        colin = colinearities(df, list_choice)
+        st.write("Calculation of the Variance inflation factor, It is a measure for multicollinearity of the design matrix ")
+        st.write(colin)
+        list_choice2 = st.multiselect("Refine your features", options=liste_col, default=list_choice)
+        autoML = st.text_input("if you want a fully automated analyses write YES","NO")
+        if autoML == "YES":
+            df2 = standariztion_features(df,list_choice2)
+            X_train, X_test, y_train, y_test = split_dataset(df2)
+            #X_train, y_train = balancing_train(X_train, y_train)
+            auto_ML_selection(X_train,y_train,X_test,y_test)
+        else:
+            st.write("The autoanalysis will not be done")
 
 
 elif type_data == "NailsDetection":
