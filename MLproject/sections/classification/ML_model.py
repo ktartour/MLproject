@@ -1,6 +1,3 @@
-#Do a fully automatize pipeline or an option to chose everythong you want
-
-#Essayer de mettre le GridsearchCV dans la boucle de tous les model de classification à tester:
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
@@ -28,19 +25,30 @@ def split_dataset(df,test_size=0.2):
 #split the dataset
     X_train, X_test, y_train, y_test = train_test_split(df.iloc[:,:-1], df.iloc[:,-1], test_size=test_size, random_state=42)
     return X_train, X_test, y_train, y_test
-def balancing_train(X_train,y_train):
+def Balancing(X_train, y_train):
 
-    smote = SMOTE()
-    X_train_smote, y_train_smote = smote.fit_resample(X_train, y_train)
-    return X_train_smote, y_train_smote
-def auto_ML_selection(df2,balancing="YES"):
+    categories_counts = y_train.value_counts()
+    categories_counts = categories_counts.rename({0: "Vin sucré", 1: "Vin éuilibré", 2: "Vin amer"})
+    categories_counts = categories_counts.to_frame()
+    categories_counts["percent"] = 100 * round(categories_counts["count"] / categories_counts["count"].sum(), 4)
+
+    st.write(categories_counts)  ##
+
+    if ((categories_counts["percent"] > 43).any()) or ((categories_counts["percent"] < 25).any()):
+        st.write("The dataset is imbalanced, it will be corrected with SMOTE oversampling")
+        smote = SMOTE()  # Oversampling method
+        X_train_smote, y_train_smote = smote.fit_resample(X_train, y_train)
+        return X_train_smote, y_train_smote
+    else:
+        st.write("The dataset is considered balanced")
+
+        return X_train, y_train
+
+def auto_ML_selection(df2):
 # Define the parameter grid to search over
     X_train, X_test, y_train, y_test = split_dataset(df2)
-    st.write(y_train.value_counts())
-    if balancing == "YES":
-        X_train, y_train = balancing_train(X_train, y_train)
-    else:
-        pass
+    X_train, y_train = Balancing(X_train, y_train)
+
 
     param_grid = {'LogisticRegression':{
         'max_iter':[10000, 1000, 100, 10], 'solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga']},
