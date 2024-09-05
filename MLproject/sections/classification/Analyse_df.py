@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 from math import ceil
 import seaborn as sns
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+import os
 
 def load_and_encode():
-    df=pd.read_csv("/home/kevin/PycharmProjects/MLproject/data/vin.csv")
+    df=pd.read_csv("data/vin.csv")
 
     #replace Vin éuilibré par 1, Vin amer par 0 et vin sucré par 2
     df["target"]=df["target"].replace("Vin éuilibré",1)

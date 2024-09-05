@@ -20,30 +20,37 @@ type_data = st.sidebar.radio(
 if type_data == "Regression":
     regression_page()
 elif type_data == "Classification":
-    df = load_and_encode()
-    histogram_plot(df)
-#Identify columns of interest based on correlation with the target
-    liste_col = list(df.columns[:-1])
+    tab1, tab2, tab3 = st.tabs(["Preparation", "Analyse", "play with parameters"])
+    with tab1:
+        st.header("Preparation")
+        st.write("test")
+    with tab2:
+        st.header("Analyse")
+        df = load_and_encode()
+        histogram_plot(df)
+    #Identify columns of interest based on correlation with the target
+        liste_col = list(df.columns[:-1])
 
-    correlation_table(df,list_items=liste_col)  #
+        correlation_table(df,list_items=liste_col)  #
 
-    explicative_columns(df)     #Return and print the correlation between target and feature with the thershold asked to the user
+        explicative_columns(df)     #Return and print the correlation between target and feature with the thershold asked to the user
 
-    list_choice = st.multiselect("Define your features of interest", options=liste_col, default=liste_col)
-    #first_check = st.button("Afficher les corrélations")
-    #first_check = st.text_input("Afficher les corrélations")
-    if st.checkbox("Print correlations"):
-        pairplots(df,list_choice)
-        colinearities(df, list_choice)
+        list_choice = st.multiselect("Define your features of interest", options=liste_col, default=liste_col)
+        #first_check = st.button("Afficher les corrélations")
+        #first_check = st.text_input("Afficher les corrélations")
+        if st.checkbox("Print correlations"):
+            pairplots(df,list_choice)
+            colinearities(df, list_choice)
 
-        list_choice2 = st.multiselect("Refine your features", options=liste_col, default=list_choice)
-        autoML = st.text_input("if you want a fully automated analyses write YES","NO")
-        if autoML == "YES":
-            df2 = standardization_features(df,list_choice2)
-            auto_ML_selection(df2,"YES")
-        else:
-            st.write("The autoanalysis will not be done")
-
+            list_choice2 = st.multiselect("Refine your features", options=liste_col, default=list_choice)
+            autoML = st.text_input("if you want a fully automated analyses write YES","NO")
+            if autoML == "YES":
+                df2 = standardization_features(df,list_choice2)
+                auto_ML_selection(df2,"YES")
+            else:
+                st.write("The autoanalysis will not be done")
+    with tab3:
+        st.header("play with parameters")
 
 elif type_data == "NailsDetection":
     nail_page()
