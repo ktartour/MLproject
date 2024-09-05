@@ -30,9 +30,11 @@ def histogram_plot(df):
     # Flatten axes for easy iteration if it's 2D
     axes = axes.flatten()
 
+
     # Plot a histogram for each column
+
     for i, column in enumerate(df.columns):
-        axes[i].hist(df[column], bins=10, color='skyblue', edgecolor='black')
+        sns.histplot(df[column], bins=10, kde=True, color='skyblue', ax=axes[i])
         axes[i].set_title(f'Histogram of {column}')
         axes[i].set_xlabel(column)
         axes[i].set_ylabel('Frequency')
@@ -85,20 +87,23 @@ def correlation_table(df,list_items):      #Idem list to ask
 
 def explicative_columns(df):
     # Mise en avant des corrélations supérieures à un seuil donné
-
+    threshold = st.text_input("Let's select features correlating with the target, which threshold to use?", "0.5")
+    threshold = float(threshold)
     correlations = df.corr()['target'].drop('target')
     # Initialize the list to store features with high correlation
     data = [["Feature", "Correlation"]]
-    seuil = 0.5
+
 
     # Iterate over the correlations and filter by the threshold
     for feature, correlation in correlations.items():
-        if abs(correlation) > seuil:
+        if abs(correlation) > threshold:
             data.append([feature, correlation])
 
     # Convert the list to a DataFrame with proper column names
     df_correlated_features = pd.DataFrame(data[1:], columns=data[0])
     df_correlated_features = df_correlated_features.sort_values("Correlation")
+    st.write(f"Features with an absolute correlation superior to {threshold} with the target are:")
+    st.write(df_correlated_features)
     return df_correlated_features
 #Recherche des colinéarités
 
@@ -115,4 +120,7 @@ def colinearities(df, liste_columns):
     vif["VIF"] = [variance_inflation_factor(X.values, i) for i in range(X.shape[1])]
     vif=vif.sort_values(by="VIF",ascending=False)
     # Afficher les résultats
+    st.write(
+        "Calculation of the Variance inflation factor, it is a measure for multicollinearity of the design matrix ")
+    st.write(vif)
     return vif

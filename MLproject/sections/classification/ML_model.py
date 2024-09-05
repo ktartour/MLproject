@@ -15,7 +15,7 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 from imblearn.over_sampling import SMOTE
 
-def standariztion_features(df, list_columns):
+def standardization_features(df, list_columns):
     df2= pd.DataFrame()
 # standardization des colonnes de list_to_norm
     for col in list_columns:
@@ -33,8 +33,15 @@ def balancing_train(X_train,y_train):
     smote = SMOTE()
     X_train_smote, y_train_smote = smote.fit_resample(X_train, y_train)
     return X_train_smote, y_train_smote
-def auto_ML_selection(X_train,y_train,X_test,y_test):
+def auto_ML_selection(df2,balancing="YES"):
 # Define the parameter grid to search over
+    X_train, X_test, y_train, y_test = split_dataset(df2)
+    st.write(y_train.value_counts())
+    if balancing == "YES":
+        X_train, y_train = balancing_train(X_train, y_train)
+    else:
+        pass
+
     param_grid = {'LogisticRegression':{
         'max_iter':[10000, 1000, 100, 10], 'solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga']},
         'DecisionTreeClassifier':{
@@ -68,20 +75,25 @@ def auto_ML_selection(X_train,y_train,X_test,y_test):
         y_pred = best_model.predict(X_test)
         conf_matrix = confusion_matrix(y_test, y_pred)
 
-        # Create a new figure for the confusion matrix
-        fig, ax = plt.subplots()
-        sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", ax=ax)
-        ax.set_xlabel("Predicted Label")
-        ax.set_ylabel("True Label")
-        ax.set_title(f"Confusion Matrix of {model.__class__.__name__}")
-
-        # Show the plot in Streamlit
-        st.pyplot(fig)  # Now we pass the created figure object to Streamlit
+        #Print the classification report
         report_dict = classification_report(y_test, y_pred,output_dict=True)  # Set output_dict=True to return a dictionary
         df_classification_report = pd.DataFrame(report_dict)
         st.write(f"The model {model.__class__.__name__} has the following performance:")
         st.write(df_classification_report)
         st.write(f"The best parameters for the {model.__class__.__name__} are {best_params}")
+
+        with st.expander("See confusion matrix"):
+
+            # Create a new figure for the confusion matrix
+            fig, ax = plt.subplots()
+            sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", ax=ax)
+            ax.set_xlabel("Predicted Label")
+            ax.set_ylabel("True Label")
+            ax.set_title(f"Confusion Matrix of {model.__class__.__name__}")
+
+            # Show the plot in Streamlit
+            st.pyplot(fig)  # Now we pass the created figure object to Streamlit
+
         #save the model as a binary avec scikit learn
         # save the model to disk
         #filename = f'sample_data/{model.__class__.__name__}.sav'
